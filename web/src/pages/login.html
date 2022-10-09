@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    #authBox {
+      display: flex;
+      flex-wrap: wrap;
+      width: 200px;
+      height: 200px;
+      margin: 0 auto;
+      margin-top: 200px;
+      /* transform: translateX(-50%); */
+      /* border: 1px solid #ccc; */
+    }
+
+    #signinBtn {
+      flex: 1 200px;
+      width: 60px;
+      height: 50px;
+      border: 0px;
+      background-color: #ccc;
+      transition: all 500ms;
+    }
+
+    #signinBtn:hover {
+      background-color: rgba(0, 255, 255, 0.2);
+    }
+
+    #signUpBtn {
+      flex: 1 200px;
+      width: 60px;
+      height: 50px;
+      border: 0px;
+      background-color: #ccc;
+      transition: all 500ms;
+    }
+
+    #signUpBtn:hover {
+      background-color: rgba(0, 255, 255, 0.2);
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1 style="text-align: center">
+      authorize with casdoor
+    </h1>
+  </header>
+  <div id="authBox">
+    <button id="signinBtn">signin</button>
+    <button id="signUpBtn">signup</button>
+  </div>
+  <!--init the SDK-->
+  <script type="module">
+    //Import from cdn(you can choose the appropriate cdn source according to your needs), or just from the local(download the casdoor-js-sdk first)
+    import SDK from 'https://unpkg.com/casdoor-js-sdk@latest/lib/esm/sdk.js'
+    const sdkConfig = {
+      serverUrl: "http://localhost:8000",
+      clientId: "f46d02622e9661862c7e",
+      appName: "app-built-in",
+      organizationName: "built-in",
+      redirectPath: "/"
+    }
+    // call sdk to handle
+    window.sdk = new SDK(sdkConfig)
+  </script>
+  <script>
+    // call the function
+    function gotoSignUpPage() {
+      // window.location.href = sdk.getSigninUrl()
+      console.log(sdk.getSigninUrl());
+    }
+    const signinBtn = document.querySelector("#signinBtn");
+    signinBtn.addEventListener("click", gotoSignUpPage);
+
+    function gotoSignInPage() {
+      return console.log(sdk.getSignupUrl());
+    }
+    const signUpBtn = document.querySelector('#signUpBtn');
+    signUpBtn.addEventListener("click", gotoSignInPage);
+  </script>
+</body>
+
+</html>
