@@ -86,7 +86,6 @@
         }, 100);
 
         function setInfo(res) {
-          console.log('set', res);
           let userinfo = res;
           usernameElement.innerHTML = userinfo.displayName || userinfo.name;
           avatarElement.src = userinfo.avatar;
