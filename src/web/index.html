@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <button id="signIn">sign in</button>
+  <button id="signUp">sign up</button>
+  <div class="displayInfo" style="border: 1px solid #ccc;">
+    <label for="avatar">avatar</label><img id="avatar" />
+    <section class="username">username</section>
+    <section class="email">email</section>
+  </div>
+
+  <!--init the SDK-->
+  <script type="module">
+    //Import from cdn(you can choose the appropriate cdn source according to your needs), or just from the local(download the casdoor-js-sdk first)
+    import SDK from 'https://unpkg.com/casdoor-js-sdk@latest/lib/esm/sdk.js'
+    const sdkConfig = {
+      serverUrl: "http://localhost:8000",
+      clientId: "06effe8f48f0047c7462",
+      appName: "app-built-in",
+      organizationName: "built-in",
+      redirectPath: "/",
+    }
+    window.sdk = new SDK(sdkConfig)
+  </script>
+  <script type="text/javascript">
+    window.addEventListener('load', () => {
+      if (window.location.href.indexOf('code') !== -1 && !window.location.href.includes('oauth')) {
+        let usernameElement = document.querySelector(".username")
+        let avatarElement = document.querySelector("#avatar");
+        let emailElement = document.querySelector(".email");
+        // console.log(usernameElement, avatarElement, emailElement);
+        // fetch('http://localhost:8080/api/userinfo').then(res => res.json()).then(userinfo => {
+        //   console.log(userinfo)
+        //   usernameElement.innerHTML = userinfo[0].displayName;
+        //   avatarElement.baseURI = userinfo[0].avatar;
+        //   emailElement.innerHTML = userinfo[0].email;
+        // });
+
+        //get token
+        sdk.signin("http://localhost:8080").then(res => {
+          let userinfo = res;
+          console.log(userinfo);
+          usernameElement.innerHTML = userinfo.displayName || userinfo.name;
+          avatarElement.src = userinfo.avatar;
+          avatarElement.innerText = " ";
+          emailElement.innerHTML = userinfo.email || 'not set';
+        });
+      };
+      //get the element
+      const signInBtn = document.querySelector("#signIn");
+      const signUpBtn = document.querySelector("#signUp")
+      function gotoSignInPage() {
+        window.location.href = sdk.getSigninUrl();
+      }
+      function gotoSignUppage() {
+        window.location.href = sdk.getSignupUrl();
+      }
+      signInBtn.addEventListener("click", gotoSignInPage);
+      signUpBtn.addEventListener("click", gotoSignUppage);
+    })
+  </script>
+</body>
+
+</html>
