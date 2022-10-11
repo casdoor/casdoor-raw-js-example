@@ -46,7 +46,7 @@
     import SDK from 'https://unpkg.com/casdoor-js-sdk@latest/lib/esm/sdk.js'
     const sdkConfig = {
       serverUrl: "http://localhost:8000",
-      clientId: "06effe8f48f0047c7462",
+      clientId: "acfa8652c773014ac254",
       appName: "app-built-in",
       organizationName: "built-in",
       redirectPath: "/",
@@ -75,15 +75,18 @@
         }
         async function getInfo() {
           let token = sessionStorage.getItem('token');
-          if (!token) return;
-          return fetch(`http://localhost:8080/api/getUserInfo?token=${token}`).then(res => res.json());
+          if (!token) { return; }
+          else {
+            return fetch(`http://localhost:8080/api/getUserInfo?token=${token}`).then(res => res.json());
+          }
         }
 
-        getInfo().then(res => {
-          setInfo(res);
-        });
+        setTimeout(() => {
+          getInfo().then(res => setInfo(res));
+        }, 100);
 
         function setInfo(res) {
+          console.log('set', res);
           let userinfo = res;
           usernameElement.innerHTML = userinfo.displayName || userinfo.name;
           avatarElement.src = userinfo.avatar;

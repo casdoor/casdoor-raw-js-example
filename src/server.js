@@ -40,8 +40,8 @@ nCCJHBcAyFnm1hdvdwEdH33jDBjNB6ciotJZrf/3VYaIWSalADosHAgMWfXuWP+h
 
 const authCfg = {
   endpoint: 'http://localhost:8000',
-  clientId: '06effe8f48f0047c7462',
-  clientSecret: '068e46ac783e773154c24fbc7f5e8bb69ff8b826',
+  clientId: 'acfa8652c773014ac254',
+  clientSecret: '059d85603d69eefae3825bf70c14d1ec27551673',
   certificate: cert,
   orgName: 'built-in',
 }
@@ -60,6 +60,7 @@ const server = http.createServer((req,res)=>{
       let urlObj = url.parse(req.url,true).query;
       let user = sdk.parseJwtToken(urlObj.token);
       res.write(JSON.stringify(user));
+      
       res.end();
     }
   }else if(req.method === "POST"){
