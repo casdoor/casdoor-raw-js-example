@@ -1,5 +1,6 @@
 const http = require('http');
 const path = require('path');
+const url = require('url')
 const { SDK } = require('casdoor-nodejs-sdk');
 const fs = require('fs');
 const fetch = require("node-fetch")
@@ -54,34 +55,17 @@ const server = http.createServer((req,res)=>{
         res.write(data);
         res.end();
       });
-    }else if( req.url === "/api/userinfo"){// 多余
-      sdk.getUsers().then(result => {
-        let {data : users} = result;
-        let userinfo = [];
-        users.forEach((item)=>{
-          let temp = {};
-          temp.displayName = item.displayName || item.name;
-          temp.avatar = item.avatar;
-          temp.email = item.email || "not set";
-          userinfo.push(temp);
-        })
-
-        res.write(JSON.stringify(userinfo));
-        res.end();
-
-        }
-      )
+    }
+    if(req.url.includes("api/getUserInfo")){
+      let urlObj = url.parse(req.url,true).query;
+      let user = sdk.parseJwtToken(urlObj.token);
+      res.write(JSON.stringify(user));
+      res.end();
     }
   }else if(req.method === "POST"){
-      let url = req.url;
-      let location1 = url.indexOf('code');
-      let location2 = url.indexOf('state');
-      const code = url.slice(location1+5,location2-1);
-      const state = url.slice(location2+6);
-      sdk.getAuthToken(code).then(result=> {
-        const user = sdk.parseJwtToken(result);
-        console.log(user);
-        res.write(JSON.stringify(user));
+      let urlObj = url.parse(req.url,true).query;
+      sdk.getAuthToken(urlObj.code).then(result=> {
+        res.write(JSON.stringify({token:result}));
         res.end();
       });
     }
