@@ -44,4 +44,4 @@ npm start
 
 ​	Finally  , it runs in your browser look like below gif represented.
 
-![](https://github.com/kcfuler/casdoor-vanilla-js-example/blob/master/gif/%E7%A4%BA%E4%BE%8B%E8%A7%86%E9%A2%91.gif?raw=true)
+https://github.com/kcfuler/casdoor-vanilla-js-example/blob/master/gif/%E7%A4%BA%E4%BE%8B%E8%A7%86%E9%A2%911.gif?raw=true
