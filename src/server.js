@@ -3,8 +3,6 @@ const path = require('path');
 const url = require('url')
 const { SDK } = require('casdoor-nodejs-sdk');
 const fs = require('fs');
-const fetch = require("node-fetch")
-
 //init sdk
 const cert = `
 -----BEGIN CERTIFICATE-----

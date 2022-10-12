@@ -6,39 +6,25 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <style>
+    .show {
+      display: block;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
 </head>
 
 <body>
   <div style="display: flex;height: 100vh; align-items: center; justify-content: center;">
     <div class="login" style="width: 200px; text-align: center;">
-      <div style="width: 200px ;height:100px;">
-        <button id="signIn" style="width: 200px;height: 50px;">sign in</button>
-        <button id="signUp" style="width: 200px;height: 50px">sign up</button>
+      <span id="username" class="hidden">userName: <span class="username"></span></span>
+      <div style="width: 300px ;height:50px;">
+        <button class="show" id="signIn" style="width: 200px;height: 50px;">Login with Casdoor</button>
+        <button class="hidden" id="signOut" style="width: 200px;height: 50px;">logout </button>
       </div>
-      <table style="border:1px solid #ccc;width: 200px;border-radius: 5px;" id="userInfoTable">
-        <thead>
-          <tr>
-            <td style="border:2px solid #ccc ;">userinfo</td>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-              <img id="avatar" width="50px" height="50px" />
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <section class="username">username</section>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <section class="email">email</section>
-            </td>
-          </tr>
-        </tbody>
-      </table>
     </div>
   </div>
 
@@ -59,17 +45,16 @@
   <script type="text/javascript">
     window.addEventListener('load', () => {
       if (window.location.href.indexOf('code') !== -1) {
-        let usernameElement = document.querySelector(".username")
-        let avatarElement = document.querySelector("#avatar");
-        let emailElement = document.querySelector(".email");
-        let loginBox = document.querySelector(".login");
+        let usernameElement = document.querySelector(".username");
+        let signOutBtn = document.querySelector("#signOut");
+        let signInBtn = document.querySelector("#signIn");
+        let usernameLabel = document.querySelector("#username");
 
+        signInBtn.className = "hidden";
+        signOutBtn.className = "show";
+        usernameLabel.className = "show";
 
-        let signOutButton = document.createElement("button");
-        signOutButton.innerText = "signOut";
-        loginBox.insertBefore(signOutButton, null);
-
-        signOutButton.addEventListener("click", signOut);
+        signOutBtn.addEventListener("click", signOut);
 
         if (!sessionStorage.getItem('token')) {
           sdk.signin("http://localhost:8080").then(res => {
@@ -90,10 +75,7 @@
 
         function setInfo(res) {
           let userinfo = res;
-          usernameElement.innerHTML = userinfo.displayName || userinfo.name;
-          avatarElement.src = userinfo.avatar;
-          avatarElement.innerText = " ";
-          emailElement.innerHTML = userinfo.email || 'not set';
+          usernameElement.innerHTML = userinfo.name;
         }
 
         function signOut() {
@@ -103,7 +85,6 @@
       };
       //get the element
       const signInBtn = document.querySelector("#signIn");
-      const signUpBtn = document.querySelector("#signUp");
       function gotoSignInPage() {
         window.location.href = sdk.getSigninUrl();
       }
@@ -111,7 +92,6 @@
         window.location.href = sdk.getSignupUrl();
       }
       signInBtn.addEventListener("click", gotoSignInPage);
-      signUpBtn.addEventListener("click", gotoSignUppage);
     })
   </script>
 </body>
