@@ -57,7 +57,7 @@
         signOutBtn.addEventListener("click", signOut);
 
         if (!sessionStorage.getItem('token')) {
-          sdk.signin("http://localhost:8080").then(res => {
+          sdk.signin("http://localhost:5000").then(res => {
             sessionStorage.setItem('token', res.token);
           });
         }
@@ -65,7 +65,7 @@
           let token = sessionStorage.getItem('token');
           if (!token) { return; }
           else {
-            return fetch(`http://localhost:8080/api/getUserInfo?token=${token}`).then(res => res.json());
+            return fetch(`http://localhost:5000/api/getUserInfo?token=${token}`).then(res => res.json());
           }
         }
 
@@ -80,7 +80,7 @@
 
         function signOut() {
           sessionStorage.removeItem("token");
-          window.location.href = "http://localhost:8080";
+          window.location.href = "http://localhost:5000";
         }
       };
       //get the element

@@ -38,10 +38,10 @@ npm install
 npm start
 ```
 
-​	If there no problem in above steps , you can see the terminal console : ` server listen at http://localhost:8080` 
+If there is no problem in above steps , you can see the terminal console : ` server listen at http://localhost:5000` 
 
-​    You can press `Ctrl+C` and click this link , or input it to your browser. 
+You can press `Ctrl+C` and click this link , or input it to your browser. 
 
-​	Finally  , it runs in your browser look like below gif represented.
+Finally, it runs in your browser look like below gif represented.
 
 ![screenshot](screenshot.gif)

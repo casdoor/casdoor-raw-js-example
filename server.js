@@ -58,7 +58,7 @@ const server = http.createServer((req,res)=>{
       let urlObj = url.parse(req.url,true).query;
       let user = sdk.parseJwtToken(urlObj.token);
       res.write(JSON.stringify(user));
-      
+
       res.end();
     }
   }else if(req.method === "POST"){
@@ -70,6 +70,6 @@ const server = http.createServer((req,res)=>{
     }
 })
 
-server.listen('8080',()=>{
-  console.log('server listen at http://localhost:8080');
+server.listen('5000',()=>{
+  console.log('server listen at http://localhost:5000');
 })
