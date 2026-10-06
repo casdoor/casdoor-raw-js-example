@@ -1,0 +1,30 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Smoke test
+        run: |
+          node server.js &
+          for i in {1..30}; do
+            curl -fsS http://localhost:5000/ >/dev/null && break
+            sleep 1
+          done
+          curl -fsS http://localhost:5000/ | grep -q "Login with Casdoor"
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:5000/api/getUserInfo)" = 401

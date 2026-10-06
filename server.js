@@ -1,9 +1,11 @@
 const http = require('http');
 const path = require('path');
-const url = require('url')
-const { SDK } = require('casdoor-nodejs-sdk');
 const fs = require('fs');
-//init sdk
+const { SDK } = require('casdoor-nodejs-sdk');
+
+const port = process.env.PORT || 5000;
+
+// the certificate of the cert used by the application, see Casdoor -> Certs
 const cert = `
 -----BEGIN CERTIFICATE-----
 MIIE+TCCAuGgAwIBAgIDAeJAMA0GCSqGSIb3DQEBCwUAMDYxHTAbBgNVBAoTFENh
@@ -36,40 +38,70 @@ nCCJHBcAyFnm1hdvdwEdH33jDBjNB6ciotJZrf/3VYaIWSalADosHAgMWfXuWP+h
 -----END CERTIFICATE-----
 `;
 
+// The Casdoor application, the defaults are the public demo server https://door.casdoor.com
 const authCfg = {
   endpoint: 'https://door.casdoor.com',
-  clientId: '0ba528121ea87b3eb54d',
-  clientSecret: '04f4ca22101529a3503d5a653a877b4e8403edf0',
+  clientId: '294b09fbc17f95daf2fe',
+  clientSecret: 'dd8982f7046ccba1bbd7851d5c1ece4e52bf039d',
   certificate: cert,
   orgName: 'casbin',
-}
+  appName: 'app-vue-python-example',
+};
 const sdk = new SDK(authCfg);
 
-const server = http.createServer((req,res)=>{
-  if(req.method === "GET"){
-    if(req.url === '/' || req.url[req.url.indexOf('/') + 1] === '?'){
-      fs.readFile(path.resolve(__dirname,'./index.html'),(err,data)=>{
-        res.setHeader("Content-Type","text/html");
-        res.write(data);
-        res.end();
-      });
-    }
-    if(req.url.includes("api/getUserInfo")){
-      let urlObj = url.parse(req.url,true).query;
-      let user = sdk.parseJwtToken(urlObj.token);
-      res.write(JSON.stringify(user));
+function sendJson(res, status, body) {
+  res.writeHead(status, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify(body));
+}
 
-      res.end();
-    }
-  }else if(req.method === "POST"){
-      let urlObj = url.parse(req.url,true).query;
-      sdk.getAuthToken(urlObj.code).then(result=> {
-        res.write(JSON.stringify({token:result}));
-        res.end();
-      });
-    }
-})
+const server = http.createServer(async (req, res) => {
+  const url = new URL(req.url, `http://${req.headers.host}`);
 
-server.listen('5000',()=>{
-  console.log('server listen at http://localhost:5000');
-})
+  // the page, also served at the callback path Casdoor redirects back to
+  if (req.method === 'GET' && (url.pathname === '/' || url.pathname === '/callback')) {
+    fs.readFile(path.resolve(__dirname, './index.html'), (err, data) => {
+      if (err) {
+        sendJson(res, 500, { status: 'error', msg: err.message });
+        return;
+      }
+      res.writeHead(200, { 'Content-Type': 'text/html' });
+      res.end(data);
+    });
+    return;
+  }
+
+  // exchanges the code that Casdoor redirected back with for an access token,
+  // called by sdk.signin() of casdoor-js-sdk
+  if (req.method === 'POST' && url.pathname === '/api/signin') {
+    try {
+      const token = await sdk.getAuthToken(url.searchParams.get('code'));
+      if (!token.access_token) {
+        sendJson(res, 400, { status: 'error', msg: 'failed to get the access token' });
+        return;
+      }
+      sendJson(res, 200, { status: 'ok', token: token.access_token });
+    } catch (e) {
+      sendJson(res, 400, { status: 'error', msg: e.message });
+    }
+    return;
+  }
+
+  // returns the user of the access token in "Authorization: Bearer <token>",
+  // the token is a JWT and is verified with the certificate
+  if (req.method === 'GET' && url.pathname === '/api/getUserInfo') {
+    const authorization = req.headers.authorization || '';
+    const token = authorization.startsWith('Bearer ') ? authorization.slice('Bearer '.length) : '';
+    try {
+      sendJson(res, 200, { status: 'ok', data: sdk.parseJwtToken(token) });
+    } catch (e) {
+      sendJson(res, 401, { status: 'error', msg: 'invalid token' });
+    }
+    return;
+  }
+
+  sendJson(res, 404, { status: 'error', msg: 'not found' });
+});
+
+server.listen(port, () => {
+  console.log(`server listen at http://localhost:${port}`);
+});

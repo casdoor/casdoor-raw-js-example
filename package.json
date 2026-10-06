@@ -1,25 +1,21 @@
 {
   "name": "casdoor-raw-js-example",
   "version": "1.0.0",
-  "description": "",
+  "description": "Sign in with Casdoor in plain JavaScript, without a framework",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js"
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/casdoor/casdoor-raw-js-example.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/casdoor/casdoor-raw-js-example/issues"
   },
   "homepage": "https://github.com/casdoor/casdoor-raw-js-example#readme",
   "dependencies": {
-    "casdoor-nodejs-sdk": "^1.3.0",
-    "nodemon": "^2.0.20"
+    "casdoor-nodejs-sdk": "^1.36.2"
   }
 }

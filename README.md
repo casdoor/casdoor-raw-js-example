@@ -1,47 +1,82 @@
-# casdoor-raw-js-example
+# Casdoor Raw JS Example
 
----
+[![Build](https://github.com/casdoor/casdoor-raw-js-example/actions/workflows/build.yml/badge.svg)](https://github.com/casdoor/casdoor-raw-js-example/actions/workflows/build.yml)
+[![License](https://img.shields.io/github/license/casdoor/casdoor-raw-js-example)](https://github.com/casdoor/casdoor-raw-js-example/blob/master/LICENSE)
+[![Discord](https://img.shields.io/discord/1022748306096537660?logo=discord&label=discord&color=5865F2)](https://discord.gg/5rPsrAzK7S)
 
-This is an example on how to use `casdoor-js-sdk` without framework. We will show you the steps below.
+An example of signing in with [Casdoor](https://casdoor.ai/) in plain JavaScript: one HTML page without a framework or a build step, and a small Node.js backend.
 
-## What you need prepare
+| Part     | File                     | SDK                                                                 |
+|----------|--------------------------|---------------------------------------------------------------------|
+| Frontend | [index.html](index.html) | [casdoor-js-sdk](https://github.com/casdoor/casdoor-js-sdk), loaded from a CDN |
+| Backend  | [server.js](server.js)   | [casdoor-nodejs-sdk](https://github.com/casdoor/casdoor-nodejs-sdk) |
 
- 	The Casdoor should be deployed.
+![screenshot](screenshot.gif)
 
-​	 You can refer to the Casdoor official documentation for the [install guide](https://casdoor.org/docs/basic/server-installation) . Deploy the casdoor instance in **production mode**.
+## How it works
 
-​      After a successful deployment, you need to ensure:
+1. **Login with Casdoor** sends the user to the Casdoor sign-in page (`sdk.getSigninUrl()`); the random `state` in the URL is kept in sessionStorage.
+2. After signing in, Casdoor redirects back to `http://localhost:5000/callback` with `code` and `state`.
+3. The page checks the state and sends the code to the backend (`sdk.signin()`): `POST /api/signin?code=...&state=...`.
+4. The backend exchanges the code for an access token (`sdk.getAuthToken()`) and returns it; the page keeps it in sessionStorage.
+5. The page reads the user from `GET /api/getUserInfo` with `Authorization: Bearer <token>`; the backend verifies the token, a JWT, with the certificate (`sdk.parseJwtToken()`).
 
-- Open your favorite browser and visit http://localhost:8000 , you can see the login page of Casdoor.
-- Input `admin` and `123` to test login functionality is working fine
+## Prerequisites
 
-## Start
+- Node.js 18+
+- A Casdoor server. The example is preconfigured for the public demo server https://door.casdoor.com, so it runs as is. To use your own, see [Casdoor installation](https://casdoor.ai/docs/basic/server-installation).
 
-### get this example
+## Configuration
 
-``` shell
-# by ssh 
-git clone git@github.com:casdoor/casdoor-raw-js-example.git
-# by https
-git clone https://github.com/casdoor/casdoor-spring-boot-example.git
+Skip this section to try the example with the public demo server.
+
+In your Casdoor, create (or reuse) an organization and an application, and add `http://localhost:5000/callback` to the application's **Redirect URLs**. Then fill in both parts:
+
+[index.html](index.html):
+
+```js
+const sdk = new SDK({
+  serverUrl: "https://door.casdoor.com", // Casdoor server URL
+  clientId: "294b09fbc17f95daf2fe", // client ID of the application
+  appName: "app-vue-python-example", // name of the application
+  organizationName: "casbin", // organization of the application
+  redirectPath: "/callback",
+  signinPath: "/api/signin",
+})
 ```
 
-### use it 
+[server.js](server.js):
+
+```js
+const authCfg = {
+  endpoint: 'https://door.casdoor.com', // Casdoor server URL
+  clientId: '294b09fbc17f95daf2fe', // client ID of the application
+  clientSecret: 'dd8982f7046ccba1bbd7851d5c1ece4e52bf039d', // client secret of the application
+  certificate: cert, // the certificate of the cert used by the application, see Casdoor -> Certs
+  orgName: 'casbin', // organization of the application
+  appName: 'app-vue-python-example', // name of the application
+};
+```
+
+## Run
 
 ```shell
-# enter the example in your file directory 
+git clone https://github.com/casdoor/casdoor-raw-js-example
 cd casdoor-raw-js-example
-# enter the src directory and install the package
-cd src
-npm install 
-# run the server
+npm install
 npm start
 ```
 
-If there is no problem in above steps , you can see the terminal console : ` server listen at http://localhost:5000` 
+Open http://localhost:5000 and click **Login with Casdoor**. On the demo server, sign in with username `admin` and password `123`.
 
-You can press `Ctrl+C` and click this link , or input it to your browser. 
+To use another port: `PORT=3000 npm start`, and use that port in the Redirect URLs.
 
-Finally, it runs in your browser look like below gif represented.
+## Resources
 
-![screenshot](screenshot.gif)
+- [Casdoor documentation](https://casdoor.ai/docs/overview)
+- [casdoor-js-sdk](https://github.com/casdoor/casdoor-js-sdk)
+- [casdoor-nodejs-sdk](https://github.com/casdoor/casdoor-nodejs-sdk)
+
+## License
+
+[Apache-2.0](LICENSE)
